@@ -34,10 +34,13 @@ out/
 # Keep environment templates but ignore sensitive local overrides
 .env.*.local
 
-# Environment files in all apps
+# Environment files in all apps (but allow .example files)
 apps/*/.env
-apps/*/.env.*
+apps/*/.env.development
+apps/*/.env.production
+apps/*/.env.test
 apps/*/.env.local
+!apps/*/.env.*.example
 
 # Logs
 *.log
