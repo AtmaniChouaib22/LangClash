@@ -19,15 +19,25 @@ build/
 .next/
 out/
 
-# Development
+# Environment variables (NEVER commit these)
 .env
 .env.local
+.env.development
+.env.production
+.env.test
+.env.staging
 .env.development.local
 .env.test.local
 .env.production.local
+.env.staging.local
 
 # Keep environment templates but ignore sensitive local overrides
 .env.*.local
+
+# Environment files in all apps
+apps/*/.env
+apps/*/.env.*
+apps/*/.env.local
 
 # Logs
 *.log
