@@ -1,0 +1,30 @@
+{
+  "name": "langclash",
+  "version": "1.0.0",
+  "description": "A language quizz 1V1 app",
+  "homepage": "https://github.com/AtmaniChouaib22/LangClash#readme",
+  "bugs": {
+    "url": "https://github.com/AtmaniChouaib22/LangClash/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AtmaniChouaib22/LangClash.git"
+  },
+  "license": "ISC",
+  "author": "Chouaib Atmani",
+  "type": "commonjs",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=web-client",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev": "npm run dev:web & npm run dev:backend",
+    "build:web": "npm run build --workspace=web-client",
+    "build:backend": "npm run build --workspace=backend",
+    "build": "npm run build:web && npm run build:backend",
+    "test": "npm run test --workspaces"
+  }
+}
