@@ -105,9 +105,63 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.QuestionScalarFieldEnum = {
+  id: 'id',
+  text: 'text',
+  options: 'options',
+  correctAnswerIdx: 'correctAnswerIdx',
+  difficulty: 'difficulty',
+  category: 'category',
+  language: 'language',
+  targetLanguage: 'targetLanguage',
+  explanation: 'explanation',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GameScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  gameType: 'gameType',
+  maxPlayers: 'maxPlayers',
+  currentQuestion: 'currentQuestion',
+  questionsCount: 'questionsCount',
+  timePerQuestion: 'timePerQuestion',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  winnerId: 'winnerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GameParticipantScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  userId: 'userId',
+  isBot: 'isBot',
+  botName: 'botName',
+  score: 'score',
+  currentQuestion: 'currentQuestion',
+  answers: 'answers',
+  isReady: 'isReady',
+  isConnected: 'isConnected',
+  joinedAt: 'joinedAt'
+};
+
+exports.Prisma.GameQuestionScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  questionId: 'questionId',
+  order: 'order'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -120,9 +174,30 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+exports.GameStatus = exports.$Enums.GameStatus = {
+  WAITING_FOR_PLAYERS: 'WAITING_FOR_PLAYERS',
+  STARTING: 'STARTING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  FINISHED: 'FINISHED',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.GameType = exports.$Enums.GameType = {
+  PVP: 'PVP',
+  BOT: 'BOT'
+};
 
 exports.Prisma.ModelName = {
-  User: 'User'
+  User: 'User',
+  Question: 'Question',
+  Game: 'Game',
+  GameParticipant: 'GameParticipant',
+  GameQuestion: 'GameQuestion'
 };
 /**
  * Create the Client
@@ -163,7 +238,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -172,13 +246,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id          String   @id @default(cuid())\n  supabaseId  String   @unique\n  email       String   @unique\n  name        String?\n  avatar      String?\n  // Game stats\n  gamesPlayed Int      @default(0)\n  gamesWon    Int      @default(0)\n  totalScore  Int      @default(0)\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n\n  @@map(\"users\")\n}\n",
-  "inlineSchemaHash": "ed4ecaea2fe949a078636dfde16b7d69a9372bd6783dfefb32219421b71a124f",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id          String   @id @default(cuid())\n  supabaseId  String   @unique\n  email       String   @unique\n  name        String?\n  avatar      String?\n  gamesPlayed Int      @default(0)\n  gamesWon    Int      @default(0)\n  totalScore  Int      @default(0)\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n\n  // Relations\n  gameParticipants GameParticipant[]\n\n  @@map(\"users\")\n}\n\nmodel Question {\n  id               String   @id @default(cuid())\n  text             String\n  options          Json // Array of options: [\"Option A\", \"Option B\", \"Option C\", \"Option D\"]\n  correctAnswerIdx Int // Index of correct answer (0-3)\n  difficulty       String   @default(\"medium\") // easy, medium, hard\n  category         String   @default(\"spanish\") // spanish, english, french, etc.\n  language         String   @default(\"en\") // Language of the question text\n  targetLanguage   String   @default(\"es\") // Language being learned\n  explanation      String? // Optional explanation for the answer\n  createdAt        DateTime @default(now())\n  updatedAt        DateTime @updatedAt\n\n  // Relations\n  gameQuestions GameQuestion[]\n\n  @@map(\"questions\")\n}\n\nmodel Game {\n  id              String     @id @default(cuid())\n  status          GameStatus @default(WAITING_FOR_PLAYERS)\n  gameType        GameType   @default(PVP) // PVP or BOT\n  maxPlayers      Int        @default(2)\n  currentQuestion Int        @default(0)\n  questionsCount  Int        @default(5)\n  timePerQuestion Int        @default(15) // seconds\n  startedAt       DateTime?\n  endedAt         DateTime?\n  winnerId        String?\n  createdAt       DateTime   @default(now())\n  updatedAt       DateTime   @updatedAt\n\n  // Relations\n  participants  GameParticipant[]\n  gameQuestions GameQuestion[]\n\n  @@map(\"games\")\n}\n\nmodel GameParticipant {\n  id              String   @id @default(cuid())\n  gameId          String\n  userId          String? // null for bot players\n  isBot           Boolean  @default(false)\n  botName         String? // Bot display name\n  score           Int      @default(0)\n  currentQuestion Int      @default(0)\n  answers         Json     @default(\"[]\") // Array of answer indices with timestamps\n  isReady         Boolean  @default(false)\n  isConnected     Boolean  @default(true)\n  joinedAt        DateTime @default(now())\n\n  // Relations\n  game Game  @relation(fields: [gameId], references: [id], onDelete: Cascade)\n  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@map(\"game_participants\")\n}\n\nmodel GameQuestion {\n  id         String @id @default(cuid())\n  gameId     String\n  questionId String\n  order      Int // Question order in the game (0-4)\n\n  // Relations\n  game     Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)\n  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)\n\n  @@unique([gameId, order])\n  @@map(\"game_questions\")\n}\n\nenum GameStatus {\n  WAITING_FOR_PLAYERS\n  STARTING\n  IN_PROGRESS\n  FINISHED\n  CANCELLED\n}\n\nenum GameType {\n  PVP // Player vs Player\n  BOT // Player vs Bot\n}\n",
+  "inlineSchemaHash": "73e206f76ba0c266221933c0de850014383a784ce983e7fff46b9daba9a3d6f2",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"supabaseId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"gamesPlayed\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"gamesWon\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"totalScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"users\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"supabaseId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"gamesPlayed\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"gamesWon\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"totalScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"gameParticipants\",\"kind\":\"object\",\"type\":\"GameParticipant\",\"relationName\":\"GameParticipantToUser\"}],\"dbName\":\"users\"},\"Question\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"text\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"options\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"correctAnswerIdx\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"language\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetLanguage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"explanation\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"gameQuestions\",\"kind\":\"object\",\"type\":\"GameQuestion\",\"relationName\":\"GameQuestionToQuestion\"}],\"dbName\":\"questions\"},\"Game\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"GameStatus\"},{\"name\":\"gameType\",\"kind\":\"enum\",\"type\":\"GameType\"},{\"name\":\"maxPlayers\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"currentQuestion\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"questionsCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"timePerQuestion\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"endedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"winnerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"participants\",\"kind\":\"object\",\"type\":\"GameParticipant\",\"relationName\":\"GameToGameParticipant\"},{\"name\":\"gameQuestions\",\"kind\":\"object\",\"type\":\"GameQuestion\",\"relationName\":\"GameToGameQuestion\"}],\"dbName\":\"games\"},\"GameParticipant\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"gameId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isBot\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"botName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"score\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"currentQuestion\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"answers\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"isReady\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isConnected\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"joinedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"game\",\"kind\":\"object\",\"type\":\"Game\",\"relationName\":\"GameToGameParticipant\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"GameParticipantToUser\"}],\"dbName\":\"game_participants\"},\"GameQuestion\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"gameId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"questionId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"order\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"game\",\"kind\":\"object\",\"type\":\"Game\",\"relationName\":\"GameToGameQuestion\"},{\"name\":\"question\",\"kind\":\"object\",\"type\":\"Question\",\"relationName\":\"GameQuestionToQuestion\"}],\"dbName\":\"game_questions\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

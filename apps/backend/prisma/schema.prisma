@@ -15,8 +15,102 @@ model User {
   supabaseId  String   @unique
   email       String   @unique
   name        String?
+  avatar      String?
+  gamesPlayed Int      @default(0)
+  gamesWon    Int      @default(0)
+  totalScore  Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Relations
+  gameParticipants GameParticipant[]
+
   @@map("users")
+}
+
+model Question {
+  id                String   @id @default(cuid())
+  text              String
+  options           Json     // Array of options: ["Option A", "Option B", "Option C", "Option D"]
+  correctAnswerIdx  Int      // Index of correct answer (0-3)
+  difficulty        String   @default("medium") // easy, medium, hard
+  category          String   @default("spanish") // spanish, english, french, etc.
+  language          String   @default("en") // Language of the question text
+  targetLanguage    String   @default("es") // Language being learned
+  explanation       String?  // Optional explanation for the answer
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  gameQuestions GameQuestion[]
+
+  @@map("questions")
+}
+
+model Game {
+  id          String      @id @default(cuid())
+  status      GameStatus  @default(WAITING_FOR_PLAYERS)
+  gameType    GameType    @default(PVP) // PVP or BOT
+  maxPlayers  Int         @default(2)
+  currentQuestion Int     @default(0)
+  questionsCount  Int     @default(5)
+  timePerQuestion Int     @default(15) // seconds
+  startedAt   DateTime?
+  endedAt     DateTime?
+  winnerId    String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  participants GameParticipant[]
+  gameQuestions GameQuestion[]
+
+  @@map("games")
+}
+
+model GameParticipant {
+  id            String   @id @default(cuid())
+  gameId        String
+  userId        String?  // null for bot players
+  isBot         Boolean  @default(false)
+  botName       String?  // Bot display name
+  score         Int      @default(0)
+  currentQuestion Int    @default(0)
+  answers       Json     @default("[]") // Array of answer indices with timestamps
+  isReady       Boolean  @default(false)
+  isConnected   Boolean  @default(true)
+  joinedAt      DateTime @default(now())
+
+  // Relations
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("game_participants")
+}
+
+model GameQuestion {
+  id         String @id @default(cuid())
+  gameId     String
+  questionId String
+  order      Int    // Question order in the game (0-4)
+
+  // Relations
+  game     Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, order])
+  @@map("game_questions")
+}
+
+enum GameStatus {
+  WAITING_FOR_PLAYERS
+  STARTING
+  IN_PROGRESS
+  FINISHED
+  CANCELLED
+}
+
+enum GameType {
+  PVP  // Player vs Player
+  BOT  // Player vs Bot
 }
