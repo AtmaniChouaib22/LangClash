@@ -133,9 +133,63 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.QuestionScalarFieldEnum = {
+  id: 'id',
+  text: 'text',
+  options: 'options',
+  correctAnswerIdx: 'correctAnswerIdx',
+  difficulty: 'difficulty',
+  category: 'category',
+  language: 'language',
+  targetLanguage: 'targetLanguage',
+  explanation: 'explanation',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GameScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  gameType: 'gameType',
+  maxPlayers: 'maxPlayers',
+  currentQuestion: 'currentQuestion',
+  questionsCount: 'questionsCount',
+  timePerQuestion: 'timePerQuestion',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  winnerId: 'winnerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GameParticipantScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  userId: 'userId',
+  isBot: 'isBot',
+  botName: 'botName',
+  score: 'score',
+  currentQuestion: 'currentQuestion',
+  answers: 'answers',
+  isReady: 'isReady',
+  isConnected: 'isConnected',
+  joinedAt: 'joinedAt'
+};
+
+exports.Prisma.GameQuestionScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  questionId: 'questionId',
+  order: 'order'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -148,9 +202,30 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+exports.GameStatus = exports.$Enums.GameStatus = {
+  WAITING_FOR_PLAYERS: 'WAITING_FOR_PLAYERS',
+  STARTING: 'STARTING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  FINISHED: 'FINISHED',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.GameType = exports.$Enums.GameType = {
+  PVP: 'PVP',
+  BOT: 'BOT'
+};
 
 exports.Prisma.ModelName = {
-  User: 'User'
+  User: 'User',
+  Question: 'Question',
+  Game: 'Game',
+  GameParticipant: 'GameParticipant',
+  GameQuestion: 'GameQuestion'
 };
 
 /**

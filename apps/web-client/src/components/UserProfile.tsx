@@ -8,11 +8,7 @@ export const UserProfile: React.FC = () => {
   if (!user) return null;
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="text-sm">
-        <p className="text-gray-600">Welcome,</p>
-        <p className="font-semibold">{user.email}</p>
-      </div>
+    <div className="flex items-center">
       <button
         onClick={signOut}
         className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"

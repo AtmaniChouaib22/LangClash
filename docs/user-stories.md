@@ -3,11 +3,13 @@
 ## Epic 1: Authentication
 
 ### User Story 1.1: User Registration & Login
+
 **As a** new user  
 **I want** to create an account and log in  
-**So that** I can play quiz games and track my progress  
+**So that** I can play quiz games and track my progress
 
 **Scenario 1: User registration**
+
 ```gherkin
 Given I am on the registration page
 When I enter a valid email and password
@@ -17,6 +19,7 @@ And I should be redirected to the dashboard
 ```
 
 **Scenario 2: User login**
+
 ```gherkin
 Given I have an existing account
 And I am on the login page
@@ -27,6 +30,7 @@ And I should be redirected to the dashboard
 ```
 
 **Scenario 3: Invalid login**
+
 ```gherkin
 Given I am on the login page
 When I enter incorrect credentials
@@ -36,6 +40,7 @@ And I should remain on the login page
 ```
 
 **Acceptance Criteria:**
+
 - [ ] User can register with email and password via Supabase Auth
 - [ ] User can log in with valid credentials
 - [ ] User session persists across browser sessions
@@ -47,11 +52,13 @@ And I should remain on the login page
 ## Epic 2: Quick Match
 
 ### User Story 2.1: Find Opponent
+
 **As a** player  
 **I want** to quickly find an opponent  
-**So that** I can start playing immediately  
+**So that** I can start playing immediately
 
 **Scenario 1: Successful matchmaking**
+
 ```gherkin
 Given I am logged in and on the dashboard
 When I click "Quick Match"
@@ -62,8 +69,9 @@ And I should see "Opponent found! Game starting..."
 ```
 
 **Scenario 2: No opponent found - Bot fallback**
+
 ```gherkin
-Given I am in the matchmaking queue for 30 seconds
+Given I am in the matchmaking queue for 15 seconds
 And no human opponent is available
 When the timeout occurs
 Then I should be matched with a bot
@@ -72,6 +80,7 @@ And the game should start normally
 ```
 
 **Scenario 3: Cancel matchmaking**
+
 ```gherkin
 Given I am in the matchmaking queue
 When I click "Cancel"
@@ -80,10 +89,11 @@ And I should return to the dashboard
 ```
 
 **Acceptance Criteria:**
+
 - [ ] User can click "Quick Match" to find opponent
 - [ ] Matchmaking shows waiting status
 - [ ] User can cancel while waiting
-- [ ] Bot opponent as fallback after 30 seconds
+- [ ] Bot opponent as fallback after 15 seconds
 - [ ] Game starts automatically when match found
 
 ---
@@ -91,11 +101,13 @@ And I should return to the dashboard
 ## Epic 3: Quiz Gameplay
 
 ### User Story 3.1: Play Quiz Game
+
 **As a** player  
 **I want** to answer quiz questions against my opponent  
-**So that** I can test my knowledge and try to win  
+**So that** I can test my knowledge and try to win
 
 **Scenario 1: Answer question correctly**
+
 ```gherkin
 Given I am in an active quiz game
 And I see the question "What is 'hello' in Spanish?"
@@ -107,6 +119,7 @@ And the next question should appear
 ```
 
 **Scenario 2: Answer question incorrectly**
+
 ```gherkin
 Given I am in an active quiz game
 And I see a Spanish vocabulary question
@@ -118,6 +131,7 @@ And the next question should appear after 2 seconds
 ```
 
 **Scenario 3: Time runs out**
+
 ```gherkin
 Given I am viewing a quiz question
 And the timer shows 15 seconds
@@ -129,6 +143,7 @@ And the game should move to the next question
 ```
 
 **Scenario 4: Complete game**
+
 ```gherkin
 Given I am on question 5 of 5
 When I answer the final question
@@ -137,6 +152,7 @@ And I should be redirected to the results page
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Game has exactly 5 multiple choice questions
 - [ ] Each question has 4 options with 1 correct answer
 - [ ] 15 seconds timer per question
@@ -146,11 +162,13 @@ And I should be redirected to the results page
 - [ ] Real-time score updates
 
 ### User Story 3.2: See Opponent Progress
+
 **As a** player  
 **I want** to see my opponent's progress  
-**So that** I know how I'm doing compared to them  
+**So that** I know how I'm doing compared to them
 
 **Scenario 1: Real-time opponent updates**
+
 ```gherkin
 Given I am in an active quiz game
 And both players are on question 2
@@ -161,6 +179,7 @@ And I should see their current question number
 ```
 
 **Scenario 2: Score comparison**
+
 ```gherkin
 Given I am in an active quiz game
 And my current score is 200 points
@@ -171,6 +190,7 @@ And I should see that I'm behind
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Live scoreboard showing both players' scores
 - [ ] Real-time updates when opponent answers
 - [ ] Current question number for both players
@@ -181,11 +201,13 @@ And I should see that I'm behind
 ## Epic 4: Game Results
 
 ### User Story 4.1: View Game Results
+
 **As a** player  
 **I want** to see the final results after a game  
-**So that** I know who won and how I performed  
+**So that** I know who won and how I performed
 
 **Scenario 1: Win the game**
+
 ```gherkin
 Given the quiz game has ended
 And my final score is 400 points
@@ -198,6 +220,7 @@ And I should see a breakdown of my answers (3/5 correct)
 ```
 
 **Scenario 2: Lose the game**
+
 ```gherkin
 Given the quiz game has ended
 And my final score is 200 points
@@ -209,6 +232,7 @@ And I should see my performance summary
 ```
 
 **Scenario 3: Tie game**
+
 ```gherkin
 Given the quiz game has ended
 And both players have 300 points
@@ -218,6 +242,7 @@ And I should see both scores are equal
 ```
 
 **Scenario 4: Return to dashboard**
+
 ```gherkin
 Given I am viewing game results
 When I click "Play Again"
@@ -226,6 +251,7 @@ And I should be able to start a new quick match
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Clear winner/loser/tie announcement
 - [ ] Both players' final scores displayed
 - [ ] Summary of correct/incorrect answers
@@ -237,17 +263,20 @@ And I should be able to start a new quick match
 ## Technical Requirements (MVP)
 
 ### Core Features
+
 - [ ] Supabase Auth for user authentication
 - [ ] Socket.IO for real-time game communication
 - [ ] PostgreSQL database for questions and user data
 - [ ] Simple question bank with Spanish/English questions
 
 ### Performance
+
 - [ ] Game loads in under 5 seconds
 - [ ] Real-time updates under 200ms latency
 - [ ] Support for 20+ concurrent players
 
 ### Game Logic
+
 - [ ] 5 questions per game
 - [ ] 15 seconds per question
 - [ ] 100 points per correct answer
@@ -255,6 +284,7 @@ And I should be able to start a new quick match
 - [ ] Bot opponent fallback system
 
 ### UI/UX
+
 - [ ] Simple, clean interface
 - [ ] Mobile responsive design
 - [ ] Clear visual feedback for answers
@@ -266,6 +296,7 @@ And I should be able to start a new quick match
 ## MVP Definition of Done
 
 For the MVP to be complete:
+
 - [ ] User can register and login
 - [ ] User can find opponent (human or bot)
 - [ ] User can play 5-question quiz
